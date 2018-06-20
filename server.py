@@ -32,9 +32,9 @@ if __name__ == '__main__':
 import server_pool
 import db_transfer
 import web_transfer
-import speedtest_thread
-import auto_thread
-import auto_block
+#import speedtest_thread
+#import auto_thread
+#import auto_block
 from shadowsocks import shell
 from configloader import load_config, get_config
 
@@ -64,14 +64,14 @@ def main():
         threadMain = MainThread(db_transfer.DbTransfer)
     threadMain.start()
 
-    threadSpeedtest = MainThread(speedtest_thread.Speedtest)
-    threadSpeedtest.start()
+    #threadSpeedtest = MainThread(speedtest_thread.Speedtest)
+    #threadSpeedtest.start()
 
-    threadAutoexec = MainThread(auto_thread.AutoExec)
-    threadAutoexec.start()
+    #threadAutoexec = MainThread(auto_thread.AutoExec)
+    #threadAutoexec.start()
 
-    threadAutoblock = MainThread(auto_block.AutoBlock)
-    threadAutoblock.start()
+    #threadAutoblock = MainThread(auto_block.AutoBlock)
+    #threadAutoblock.start()
 
     try:
         while threadMain.is_alive():
@@ -80,12 +80,12 @@ def main():
         import traceback
         traceback.print_exc()
         threadMain.stop()
-        if threadSpeedtest.is_alive():
-            threadSpeedtest.stop()
-        if threadAutoexec.is_alive():
-            threadAutoexec.stop()
-        if threadAutoblock.is_alive():
-            threadAutoblock.stop()
+        #if threadSpeedtest.is_alive():
+        #    threadSpeedtest.stop()
+        #if threadAutoexec.is_alive():
+        #    threadAutoexec.stop()
+        #if threadAutoblock.is_alive():
+        #    threadAutoblock.stop()
 
 if __name__ == '__main__':
     main()
