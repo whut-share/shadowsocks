@@ -464,8 +464,6 @@ class DbTransfer(object):
 
         cur.close()
 
-        # 读取中转规则，如果是中转节点的话
-
         if self.is_relay:
             self.relay_rule_list = {}
 
@@ -499,9 +497,9 @@ class DbTransfer(object):
         return val1 == val2
 
     def del_server_out_of_bound_safe(self, last_rows, rows):
-        # 停止超流量的服务
-        # 启动没超流量的服务
-        # 需要动态载入switchrule，以便实时修改规则
+        #stop service out of traffic
+        #start service which is normal
+        #load switchrule dynamic
 
         try:
             switchrule = importloader.load('switchrule')
@@ -537,9 +535,11 @@ class DbTransfer(object):
             self.port_uid_table[row['port']] = row['id']
             self.uid_port_table[row['id']] = row['port']
 
+        #1: enable single_user multi port only , -1: orignal port only 0: both
         if self.mu_only == 1:
             i = 0
             while i < len(rows):
+                # 0: not single user multi port loader 1: obfs loader 2: protocol loader
                 if rows[i]['is_multi_user'] == 0:
                     rows.pop(i)
                     i -= 1
@@ -579,12 +579,17 @@ class DbTransfer(object):
                             'encode cfg key "%s" fail, val "%s"' % (name, cfg[name]))
 
             if 'node_speedlimit' in cfg:
+                # if both setting speedlimit, just choose the smaller one
                 if float(
-                        self.node_speedlimit) > 0.0 or float(
+                        self.node_speedlimit) > 0.0 and float(
                         cfg['node_speedlimit']) > 0.0:
-                    cfg['node_speedlimit'] = max(
+                    cfg['node_speedlimit'] = min(
                         float(
                             self.node_speedlimit), float(
+                            cfg['node_speedlimit']))
+                else:
+                    cfg['node_speedlimit'] = max(
+                        float(self.node_speedlimit), float(
                             cfg['node_speedlimit']))
             else:
                 cfg['node_speedlimit'] = max(
@@ -621,9 +626,11 @@ class DbTransfer(object):
             cfg['detect_hex_list'] = self.detect_hex_list.copy()
             cfg['detect_text_list'] = self.detect_text_list.copy()
 
+            # if node is relay node, and user is not protocol loader
             if self.is_relay and row['is_multi_user'] != 2:
                 temp_relay_rules = {}
                 for id in self.relay_rule_list:
+                    # relay_rule userid equal or userid equal 0 which means all user or user is a obfs loader && port equal or 0 means all port
                     if ((self.relay_rule_list[id]['user_id'] == user_id or self.relay_rule_list[id]['user_id'] == 0) or row[
                             'is_multi_user'] != 0) and (self.relay_rule_list[id]['port'] == 0 or self.relay_rule_list[id]['port'] == port):
                         has_higher_priority = False

@@ -1724,6 +1724,14 @@ class TCPRelay(object):
                 self.multi_user_host_table[common.get_mu_host(
                     id, self.multi_user_table[id]['md5'])] = id
 
+                # if has setting node_speedlimit in the upper level, just flow
+                if 'node_speedlimit' in config:
+                    bandwidth = float(config['node_speedlimit']) * 128
+                    self.mu_speed_tester_u[id] = SpeedTester(bandwidth)
+                    self.mu_speed_tester_d[id] = SpeedTester(bandwidth)
+                    continue
+
+
                 if 'node_speedlimit' not in self.multi_user_table[id]:
                     bandwidth = 0
                 else:
@@ -2113,6 +2121,14 @@ class TCPRelay(object):
             else:
                 self.multi_user_table[id][
                     '_forbidden_portset'] = PortRange(str(""))
+
+
+            # if has setting node_speedlimit in the upper level, just flow
+            if 'node_speedlimit' in self._config:
+                bandwidth = float(self._config['node_speedlimit']) * 128
+                self.mu_speed_tester_u[id] = SpeedTester(bandwidth)
+                self.mu_speed_tester_d[id] = SpeedTester(bandwidth)
+                continue
 
             if 'node_speedlimit' not in self.multi_user_table[id]:
                 bandwidth = 0
