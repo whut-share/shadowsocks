@@ -278,9 +278,9 @@ class WebTransfer(object):
         return val1 == val2
 
     def del_server_out_of_bound_safe(self, last_rows, rows):
-        # 停止超流量的服务
-        # 启动没超流量的服务
-        # 需要动态载入switchrule，以便实时修改规则
+        #stop service out of traffic
+        #start service which is normal
+        #load switchrule dynamic
 
         try:
             switchrule = importloader.load('switchrule')
@@ -368,16 +368,22 @@ class WebTransfer(object):
                             'encode cfg key "%s" fail, val "%s"' % (name, cfg[name]))
 
             if 'node_speedlimit' in cfg:
+                # if both setting speedlimit, just choose the smaller one
                 if float(
-                        self.node_speedlimit) > 0.0 or float(
+                        self.node_speedlimit) > 0.0 and float(
                         cfg['node_speedlimit']) > 0.0:
-                    cfg['node_speedlimit'] = max(
+                    cfg['node_speedlimit'] = min(
                         float(
                             self.node_speedlimit), float(
+                            cfg['node_speedlimit']))
+                else:
+                    cfg['node_speedlimit'] = max(
+                        float(self.node_speedlimit), float(
                             cfg['node_speedlimit']))
             else:
                 cfg['node_speedlimit'] = max(
                     float(self.node_speedlimit), float(0.00))
+
 
             if 'disconnect_ip' not in cfg:
                 cfg['disconnect_ip'] = ''
