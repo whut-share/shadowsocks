@@ -37,6 +37,7 @@ class DbTransfer(object):
         self.detect_hex_list = {}
         self.detect_hex_ischanged = False
         self.mu_only = False
+        self.node_offset = 0
         self.is_relay = False
 
         self.relay_rule_list = {}
@@ -337,7 +338,7 @@ class DbTransfer(object):
 
         cur = conn.cursor()
 
-        cur.execute("SELECT `node_group`,`node_class`,`node_speedlimit`,`traffic_rate`,`mu_only`,`sort` FROM ss_node where `id`='" +
+        cur.execute("SELECT `node_group`,`node_class`,`node_speedlimit`,`traffic_rate`,`mu_only`,`sort`,`node_offset` FROM ss_node where `id`='" +
                     str(get_config().NODE_ID) + "' AND (`node_bandwidth`<`node_bandwidth_limit` OR `node_bandwidth_limit`=0)")
         nodeinfo = cur.fetchone()
 
@@ -354,6 +355,7 @@ class DbTransfer(object):
         self.traffic_rate = float(nodeinfo[3])
 
         self.mu_only = int(nodeinfo[4])
+        self.node_offset = int(nodeinfo[6])
 
         if nodeinfo[5] == 10:
             self.is_relay = True
@@ -513,6 +515,7 @@ class DbTransfer(object):
         self.mu_port_list = []
 
         for row in rows:
+            row['port'] = row['port'] + self.node_offset
             if row['is_multi_user'] != 0:
                 self.mu_port_list.append(int(row['port']))
                 continue

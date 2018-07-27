@@ -36,6 +36,7 @@ class WebTransfer(object):
         self.detect_hex_list = {}
 
         self.mu_only = False
+        self.node_offset = 0
         self.is_relay = False
 
         self.relay_rule_list = {}
@@ -216,6 +217,7 @@ class WebTransfer(object):
         self.traffic_rate = nodeinfo['traffic_rate']
 
         self.mu_only = nodeinfo['mu_only']
+        self.node_offset = (int)nodeinfo['node_offset']
 
         if nodeinfo['sort'] == 10:
             self.is_relay = True
@@ -294,6 +296,7 @@ class WebTransfer(object):
         self.mu_port_list = []
 
         for row in rows:
+            row['port'] = row['port'] + self.node_offset
             if row['is_multi_user'] != 0:
                 self.mu_port_list.append(int(row['port']))
                 continue
