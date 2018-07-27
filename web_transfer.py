@@ -217,7 +217,7 @@ class WebTransfer(object):
         self.traffic_rate = nodeinfo['traffic_rate']
 
         self.mu_only = nodeinfo['mu_only']
-        self.node_offset = (int)nodeinfo['node_offset']
+        self.node_offset = nodeinfo['node_offset']
 
         if nodeinfo['sort'] == 10:
             self.is_relay = True
