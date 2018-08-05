@@ -217,7 +217,7 @@ class WebTransfer(object):
         self.traffic_rate = nodeinfo['traffic_rate']
 
         self.mu_only = nodeinfo['mu_only']
-        self.node_offset = nodeinfo['node_offset']
+        self.node_offset = int(nodeinfo['node_offset'])
 
         if nodeinfo['sort'] == 10:
             self.is_relay = True
@@ -296,7 +296,6 @@ class WebTransfer(object):
         self.mu_port_list = []
 
         for row in rows:
-            row['port'] = row['port'] + self.node_offset
             if row['is_multi_user'] != 0:
                 self.mu_port_list.append(int(row['port']))
                 continue

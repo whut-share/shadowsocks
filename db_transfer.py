@@ -380,6 +380,8 @@ class DbTransfer(object):
             d = {}
             for column in range(len(keys)):
                 d[keys[column]] = r[column]
+                if keys[column] == "port":
+                    d[keys[column]] = r[column] + self.node_offset
             rows.append(d)
         cur.close()
 
@@ -515,7 +517,6 @@ class DbTransfer(object):
         self.mu_port_list = []
 
         for row in rows:
-            row['port'] = row['port'] + self.node_offset
             if row['is_multi_user'] != 0:
                 self.mu_port_list.append(int(row['port']))
                 continue
