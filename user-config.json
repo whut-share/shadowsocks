@@ -12,13 +12,13 @@
     "protocol": "auth_aes128_md5",
     "protocol_param": "",
     "obfs": "tls1.2_ticket_auth_compatible",
-    "obfs_param": ["*:10000#127.0.0.1:80"],
+    "obfs_param": "",
     "speed_limit_per_con": 0,
 
     "dns_ipv6": false,
     "connect_verbose_info": 0,
     "connect_hex_data": 0,
-    "redirect": "",
+    "redirect": ["*:10000#127.0.0.1:80"],
     "fast_open": false,
     "friendly_detect": 1
 }
