@@ -38,6 +38,9 @@ class DbTransfer(object):
         self.detect_hex_ischanged = False
         self.mu_only = False
         self.node_offset = 0
+        self.ss_method = ''
+        self.ss_protocol = ''
+        self.ss_obfs = ''
         self.is_relay = False
 
         self.relay_rule_list = {}
@@ -338,8 +341,16 @@ class DbTransfer(object):
 
         cur = conn.cursor()
 
-        cur.execute("SELECT `node_group`,`node_class`,`node_speedlimit`,`traffic_rate`,`mu_only`,`sort`,`node_offset` FROM ss_node where `id`='" +
+
+        if get_config().NODE_CUSTOM_OBFS == 1:
+            cur.execute("SELECT `node_group`,`node_class`,`node_speedlimit`,`traffic_rate`,`mu_only`,`sort`, `node_offset`,`ss_method`,`ss_protocol`,`ss_obfs` FROM ss_node where `id`='" +
                     str(get_config().NODE_ID) + "' AND (`node_bandwidth`<`node_bandwidth_limit` OR `node_bandwidth_limit`=0)")
+        else:
+            cur.execute("SELECT `node_group`,`node_class`,`node_speedlimit`,`traffic_rate`,`mu_only`,`sort`,`node_offset` FROM ss_node where `id`='" +
+                    str(get_config().NODE_ID) + "' AND (`node_bandwidth`<`node_bandwidth_limit` OR `node_bandwidth_limit`=0)")
+
+
+
         nodeinfo = cur.fetchone()
 
         if nodeinfo is None:
@@ -355,12 +366,18 @@ class DbTransfer(object):
         self.traffic_rate = float(nodeinfo[3])
 
         self.mu_only = int(nodeinfo[4])
-        self.node_offset = int(nodeinfo[6])
 
         if nodeinfo[5] == 10:
             self.is_relay = True
         else:
             self.is_relay = False
+
+        self.node_offset = int(nodeinfo[6])
+
+        if get_config().NODE_CUSTOM_OBFS == 1:
+            self.ss_method = nodeinfo[7]
+            self.ss_protocol = nodeinfo[8]
+            self.ss_obfs = nodeinfo[9]
 
         if nodeinfo[0] == 0:
             node_group_sql = ""
@@ -380,10 +397,9 @@ class DbTransfer(object):
             d = {}
             for column in range(len(keys)):
                 d[keys[column]] = r[column]
-                if keys[column] == "port":
-                    d[keys[column]] = r[column] + self.node_offset
             rows.append(d)
         cur.close()
+
 
         # 读取节点IP
         # SELECT * FROM `ss_node`  where `node_ip` != ''
@@ -517,6 +533,20 @@ class DbTransfer(object):
         self.mu_port_list = []
 
         for row in rows:
+            row['port'] = row['port'] + self.node_offset
+
+            if get_config().NODE_CUSTOM_OBFS == 1 and row['is_multi_user'] == 0:
+                if self.ss_method:
+                    row['method'] = self.ss_method
+                if self.ss_protocol:
+                    row['protocol'] = self.ss_protocol
+                if self.ss_obfs:
+                    row['obfs'] = self.ss_obfs
+
+
+            self.port_uid_table[row['port']] = row['id']
+            self.uid_port_table[row['id']] = row['port']
+
             if row['is_multi_user'] != 0:
                 self.mu_port_list.append(int(row['port']))
                 continue
@@ -534,10 +564,6 @@ class DbTransfer(object):
                 md5_users[row['id']]['forbidden_port'] = ''
             md5_users[row['id']]['md5'] = common.get_md5(
                 str(row['id']) + row['passwd'] + row['method'] + row['obfs'] + row['protocol'])
-
-        for row in rows:
-            self.port_uid_table[row['port']] = row['id']
-            self.uid_port_table[row['id']] = row['port']
 
         #1: enable single_user multi port only , -1: orignal port only 0: both
         if self.mu_only == 1:

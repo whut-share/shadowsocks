@@ -8,8 +8,11 @@ CLOUDSAFE = 0
 ANTISSATTACK = 0
 AUTOEXEC = 0
 
+# open node customized method, obfs and protocol in frontend
+NODE_CUSTOM_OBFS = 0
+
 MU_SUFFIX = 'download.windowsupdate.com'
-MU_REGEX = '%suffix'
+MU_REGEX = '%5m%id.%suffix'
 
 SERVER_PUB_ADDR = '127.0.0.1'  # mujson_mgr need this to generate ssr link
 API_INTERFACE = 'glzjinmod'  # glzjinmod, modwebapi
