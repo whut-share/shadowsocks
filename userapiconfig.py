@@ -9,7 +9,7 @@ ANTISSATTACK = 0
 AUTOEXEC = 0
 
 # open node customized method, obfs and protocol in frontend
-NODE_CUSTOM_OBFS = 0
+NODE_CUSTOM_OBFS = 1
 
 MU_SUFFIX = 'download.windowsupdate.com'
 MU_REGEX = '%5m%id.%suffix'
