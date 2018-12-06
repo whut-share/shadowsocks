@@ -507,6 +507,23 @@ class DbTransfer(object):
             cur.close()
 
         conn.close()
+
+
+        for row in rows:
+            row['port'] = row['port'] + self.node_offset
+
+            if get_config().NODE_CUSTOM_OBFS == 1 :
+                if self.ss_method:
+                    row['method'] = self.ss_method
+                if self.ss_protocol:
+                    row['protocol'] = self.ss_protocol
+                if self.ss_obfs:
+                    row['obfs'] = self.ss_obfs
+
+                if row['obfs'] == "plain" and row['is_multi_user'] == 2:
+                    row['obfs_param'] = ""
+                    #logging.error('obfs: %s obfs_param: %s' % (row['obfs'], row['obfs_param'] ))
+
         return rows
 
     def cmp(self, val1, val2):
@@ -533,7 +550,6 @@ class DbTransfer(object):
         self.mu_port_list = []
 
         for row in rows:
-            row['port'] = row['port'] + self.node_offset
 
             self.port_uid_table[row['port']] = row['id']
             self.uid_port_table[row['id']] = row['port']
@@ -555,14 +571,6 @@ class DbTransfer(object):
                 md5_users[row['id']]['forbidden_port'] = ''
             md5_users[row['id']]['md5'] = common.get_md5(
                 str(row['id']) + row['passwd'] + row['method'] + row['obfs'] + row['protocol'])
-
-            if get_config().NODE_CUSTOM_OBFS == 1 and row['is_multi_user'] == 0:
-                if self.ss_method:
-                    row['method'] = self.ss_method
-                if self.ss_protocol:
-                    row['protocol'] = self.ss_protocol
-                if self.ss_obfs:
-                    row['obfs'] = self.ss_obfs
 
 
         #1: enable single_user multi port only , -1: orignal port only 0: both
