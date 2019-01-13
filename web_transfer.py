@@ -270,6 +270,10 @@ class WebTransfer(object):
                 d['priority'] = int(rule['priority'])
                 self.relay_rule_list[d['id']] = d.copy()
 
+        for row in rows:
+            if row['is_multi_user'] != 0:
+                row['port'] = row['port'] + self.node_offset
+
         return rows
 
     def cmp(self, val1, val2):

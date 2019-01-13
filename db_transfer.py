@@ -510,7 +510,8 @@ class DbTransfer(object):
 
 
         for row in rows:
-            row['port'] = row['port'] + self.node_offset
+            if row['is_multi_user'] != 0:
+                row['port'] = row['port'] + self.node_offset
 
             if get_config().NODE_CUSTOM_OBFS == 1 :
                 if self.ss_method:
